@@ -99,7 +99,7 @@ void test_phase_3() {
         // Test basic construction
         std::cout << "Testing DJUniquePtr construction..." << std::endl;
         PointerWrapper<MP3Track> smart_track(new MP3Track("Smart Track", {"AI Artist"}, 240, 130, 320));
-
+        
         // Test access operators (will be TODO messages initially)
         std::cout << "\nTesting access operators..." << std::endl;
         if (smart_track) {

@@ -13,7 +13,7 @@ Playlist::~Playlist() {
     std::cout << "Destroying playlist: " << playlist_name << std::endl;
     #endif
     PlaylistNode* curr = head;
-    while (curr != nullptr) {
+    while (curr) {
         PlaylistNode* next = curr->next;
         delete curr;
         curr = next;
