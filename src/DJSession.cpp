@@ -148,8 +148,74 @@ void DJSession::simulate_dj_performance() {
     std::cout << "Cache Capacity: " << session_config.controller_cache_size << " slots (LRU policy)" << std::endl;
     std::cout << "\n--- Processing Tracks ---" << std::endl;
 
-    std::cout << "TODO: Implement the DJ performance simulation workflow here." << std::endl;
-    // Your implementation here
+    if(play_all){
+        std::vector<std::string> playlist_names;
+        for (const auto& pair : session_config.playlists) {
+            playlist_names.push_back(pair.first);
+        }
+        std::sort(playlist_names.begin(), playlist_names.end());
+
+        for(std::string name : playlist_names){
+            if(!load_playlist(name)){
+                std::cout << " [ERROR] failed to load: " << name << "\n";
+                continue;
+            }
+            
+            for(std::string title : track_titles){
+                std::cout <<"  \n–- Processing: " << title << "--";
+                stats.tracks_processed++;
+                load_track_to_controller(title);
+                if(!load_track_to_mixer_deck(title)) continue;
+
+            }
+            print_session_summary();
+            stats.tracks_processed = 0;
+            stats.cache_hits = 0;
+            stats.cache_misses = 0;
+            stats.cache_evictions = 0;
+            stats.deck_loads_a = 0;
+            stats.deck_loads_b = 0;
+            stats.transitions = 0;
+            stats.errors = 0;
+        }
+        std::cout << " all playlists played.";
+        }
+
+    if(!play_all){
+
+        while(true){
+        std::string selected_playlist =  display_playlist_menu_from_config();
+        if(selected_playlist.empty()){
+            break;
+        }
+            if(!load_playlist(selected_playlist)){
+                std::cout << " [ERROR] failed to load: " << selected_playlist << "\n";
+                continue;
+            }
+            
+            for(std::string title : track_titles){
+                std::cout <<"  \n–- Processing: " << title << "--";
+                stats.tracks_processed++;
+                load_track_to_controller(title);
+                if(!load_track_to_mixer_deck(title)) continue;
+
+            }
+            print_session_summary();
+            stats.tracks_processed = 0;
+            stats.cache_hits = 0;
+            stats.cache_misses = 0;
+            stats.cache_evictions = 0;
+            stats.deck_loads_a = 0;
+            stats.deck_loads_b = 0;
+            stats.transitions = 0;
+            stats.errors = 0;
+        }
+
+        std::cout << " Session cancelled by user.";
+    }
+
+    
+    
 }
 
 
