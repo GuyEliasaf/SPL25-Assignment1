@@ -63,8 +63,24 @@ bool DJSession::load_playlist(const std::string& playlist_name)  {
 
  */
 int DJSession::load_track_to_controller(const std::string& track_name) {
-    // Your implementation here
-    return 0; // Placeholder
+
+    AudioTrack* track = library_service.findTrack(track_name);
+    if(!track){
+        std::cout << " [ERROR] Track: " <<track_name<< " not found in library\n";
+        stats.errors++;
+        return 0;
+    }
+    
+    std::cout << "  [System] Loading track  '" << track_name<< "' to controller...\n";
+    int load = controller_service.loadTrackToCache(*track);
+
+    if(load == 1) stats.cache_hits++;
+    else if(load == 0)  stats.cache_misses++;
+    else{
+        stats.cache_misses++;
+        stats.cache_evictions;
+    }  
+    return load;
 }
 
 /**
@@ -75,8 +91,33 @@ int DJSession::load_track_to_controller(const std::string& track_name) {
  */
 bool DJSession::load_track_to_mixer_deck(const std::string& track_title) {
     std::cout << "[System] Delegating track transfer to MixingEngineService for: " << track_title << std::endl;
-    // your implementation here
-    return false; // Placeholder
+    
+    AudioTrack* track = controller_service.getTrackFromCache(track_title);
+
+    if(!track)
+    {
+        std::cout <<  "  [ERROR] Track: " << track_title << " not found in cache\n";
+        stats.errors++;
+        return false;
+    }
+
+    int result = mixing_service.loadTrackToDeck(*track);
+    if(result == 0){
+        stats.deck_loads_a++;
+        stats.transitions++;
+    }
+    else if(result == 1){
+        stats.deck_loads_b++;
+        stats.transitions++;
+    }
+    else{
+        std::cout << " [ERROR] failed to load: " << track_title << "\n";
+        stats.errors++;
+        return false;
+    }
+
+    return true;
+
 }
 
 /**

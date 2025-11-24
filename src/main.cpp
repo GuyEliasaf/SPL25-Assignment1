@@ -41,7 +41,6 @@ void test_phase_1_memory_leaks() {
     my_playlist->add_track(mp3);
     my_playlist->add_track(wav);
     my_playlist->display();
-
     // Remove a track (this will leak if remove_track is broken)
     std::cout << "Removing track..." << std::endl;
     my_playlist->remove_track("Strobe");
